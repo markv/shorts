@@ -1,7 +1,7 @@
 var giphyApiRoot = 'http://api.giphy.com/v1/gifs';
-var weatherApiRoot = 'http://api.openweathermap.org/data/2.5/forecast';
+var weatherApiRoot = 'https://api.forecast.io/forecast';
 
-var weatherApiKey = '2de143494c0b295cca9337e1e96b00e0';
+var weatherApiKey = '188e827cda3d3d6acc437290a31e778a';
 var giphyApiKey = 'dc6zaTOxFJmzC';
 
 var weather = false;
@@ -33,16 +33,9 @@ function preloadImage(url, callback) {
 }
 
 function getWeather(lat, lon, callback) {
-  var param = {
-    lat: lat,
-    lon: lon,
-    mode: 'json',
-    appid: weatherApiKey
-  };
+  var forecastUrl = weatherApiRoot + '/' + weatherApiKey + '/' + lat + ',' + lon + '?callback=?&units=auto';
 
-  var dailyUrl = weatherApiRoot + '/daily?' + $.param(param);
-
-  $.get(dailyUrl, function(data) {
+  $.getJSON(forecastUrl, function(data) {
     return callback(null, data);
   });
 }
@@ -73,7 +66,10 @@ function getLocation(callback) {
 }
 
 function isShorts() {
-  return weather.temp.celsius >= weatherThreshold;
+  var threshold = weather.flags.units === 'si'
+                  ? weatherThreshold
+                  : ((weatherThreshold * 1.8) + 32);
+  return weather.daily.data[0].temperatureMax >= threshold;
 }
 
 getLocation(function(err, location) {
@@ -81,16 +77,10 @@ getLocation(function(err, location) {
     return preloader(err);
 
   getWeather(location.lat, location.lon, function(err, data) {
-    weather = {
-      time: data.list[0].dt,
-      temp: {
-        celsius: Math.round(data.list[0].temp.max - 273.15),
-        fahrenheit: Math.round((data.list[0].temp.max * 9/5) - 459.67)
-      }
-    };
+    weather = data;
 
     if(isShorts()){
-      return getGiphy('shorts', function(err, url) {
+      return getGiphy('celebrate', function(err, url) {
         giphyPositiveUrl = url;
         preloader();
       });
@@ -128,10 +118,11 @@ $(document).ready(function() {
     if(giphyPositiveUrl)
       $positivePage.css('background-image', 'url("' + giphyPositiveUrl + '")');
 
-    var weatherC = weather.temp.celsius + '&deg;C';
-    var weatherF = weather.temp.fahrenheit + '&deg;F';
+    var unitString = weather.flags.units === 'si'
+                     ? '&deg;C'
+                     : '&deg;F';
 
-    $weather.html(weatherC + ' / ' + weatherF);
+    $weather.html(Math.ceil(weather.daily.data[0].temperatureMax) + unitString);
   }
 
   function showPage($page) {
