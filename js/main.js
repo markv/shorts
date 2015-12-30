@@ -62,8 +62,7 @@ function getLocation(callback) {
         return callback('An unknown error occurred.');
       }
     }, {
-      enableHighAccuracy: true,
-      timeout : 5000
+      enableHighAccuracy: true
     }
   );
 }
