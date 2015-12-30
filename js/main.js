@@ -61,6 +61,9 @@ function getLocation(callback) {
         case error.UNKNOWN_ERROR:
         return callback('An unknown error occurred.');
       }
+    }, {
+      enableHighAccuracy: true,
+      timeout : 5000
     }
   );
 }
