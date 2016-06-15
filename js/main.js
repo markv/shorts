@@ -1,4 +1,4 @@
-var giphyApiRoot = 'http://api.giphy.com/v1/gifs';
+var giphyApiRoot = 'https://api.giphy.com/v1/gifs';
 var weatherApiRoot = 'https://api.forecast.io/forecast';
 
 var weatherApiKey = '188e827cda3d3d6acc437290a31e778a';
