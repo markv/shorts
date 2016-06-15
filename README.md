@@ -1,2 +1,2 @@
 # shorts
-http://markv.github.io/shorts
+https://markv.github.io/shorts
